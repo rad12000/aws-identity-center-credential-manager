@@ -13,14 +13,20 @@ app.use(express.json());
 app.post("/credentials", (req, res) => {
   const creds = req.body;
   createCredentialFile(creds);
+
   const scriptPath =
     os.platform() === "win32"
       ? ".\\configure-creds.sh"
       : "./configure-creds.sh";
 
-  exec(scriptPath);
-
-  res.status(201).end();
+  exec(scriptPath, (error) => {
+    if (error) {
+      console.log(error);
+      res.status(500).end();
+    } else {
+      res.status(201).end();
+    }
+  });
 });
 
 function createCredentialFile(creds) {
