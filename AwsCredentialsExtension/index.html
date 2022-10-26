@@ -1,6 +1,31 @@
 <html>
+  <head>
+    <style>
+      button:hover {
+        cursor: grab;
+      }
+
+      button {
+        border: solid #ff9900 3px;
+        border-radius: 5px;
+        background-color: white;
+        font-weight: bold;
+        outline: none;
+        box-shadow: 1px 2px 11px -4px black;
+      }
+
+      button:active {
+        box-shadow: none;
+      }
+
+      body {
+        text-align: center;
+      }
+    </style>
+  </head>
   <body>
     <button id="me">Refresh AWS Credentials</button>
+    <div id="result-container"></div>
     <script src="./index.js" type="module"></script>
   </body>
 </html>

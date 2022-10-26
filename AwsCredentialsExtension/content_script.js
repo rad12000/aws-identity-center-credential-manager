@@ -1,18 +1,28 @@
 runIt();
 
 async function runIt() {
-  const [dev_access, prod_access] = await Promise.all([
-    getAwsCredentials("489561981168", "Developer"),
-    getAwsCredentials("367507620554", "CodeArtifact"),
-  ]);
+  try {
+    const [dev_access, prod_access] = await Promise.all([
+      getAwsCredentials("489561981168", "Developer"),
+      getAwsCredentials("367507620554", "CodeArtifact"),
+    ]);
 
-  await fetch("http://localhost:8081/credentials", {
-    method: "POST",
-    body: JSON.stringify({ dev_access, prod_access }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+    const response = await fetch("http://localhost:8081/credentials", {
+      method: "POST",
+      body: JSON.stringify({ dev_access, prod_access }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw "failed!";
+    }
+
+    chrome.runtime.sendMessage(undefined, true);
+  } catch (e) {
+    chrome.runtime.sendMessage(undefined, false);
+  }
 }
 
 async function getSessionJwt() {
@@ -35,6 +45,10 @@ async function getAwsCredentials(accountId, roleName) {
       credentials: "omit",
     }
   );
+
+  if (!response.ok) {
+    throw "Failed!";
+  }
 
   const { roleCredentials } = await response.json();
   return roleCredentials;
