@@ -1,0 +1,13 @@
+{
+  "name": "awscredentials",
+  "version": "1.0.0",
+  "description": "",
+  "main": "",
+  "scripts": {
+    "build": "cd AwsCredentialsService && npm install && cd ..",
+    "stop": "npx forever stop AwsCredentialsService",
+    "start": "npx forever start --id AwsCredentialsService AwsCredentialsService/app.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
