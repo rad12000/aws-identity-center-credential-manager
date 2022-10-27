@@ -1,32 +1,26 @@
 const express = require("express");
 const cors = require("cors");
 const os = require("os");
-const { exec } = require("child_process");
 const { FileBuilder } = require("./file-builder");
 const { getCredentials } = require("./get-credentials");
 
+require("dotenv").config();
 const app = express();
+
+console.log(process.env.AWS_CREDENTIAL_FILE);
 
 app.use(cors());
 app.use(express.json());
 
-app.post("/credentials", (req, res) => {
-  const creds = req.body;
-  createCredentialFile(creds);
-
-  const scriptPath =
-    os.platform() === "win32"
-      ? ".\\configure-creds.sh"
-      : "./configure-creds.sh";
-
-  exec(scriptPath, (error) => {
-    if (error) {
-      console.log(error);
-      res.status(500).end();
-    } else {
-      res.status(201).end();
-    }
-  });
+app.post("/credentials", async (req, res) => {
+  try {
+    const creds = req.body;
+    createCredentialFile(creds);
+    res.status(201).end();
+  } catch (e) {
+    console.log(e);
+    res.status(500).end();
+  }
 });
 
 function createCredentialFile(creds) {
@@ -48,7 +42,7 @@ function createCredentialFile(creds) {
     fb.writeLine(profileWithBrackets).writeLine(credString.trim());
   }
 
-  fb.build("~/.aws/credentials".replace("~", os.homedir()));
+  fb.build(process.env.AWS_CREDENTIAL_FILE.replace("~", os.homedir()));
 }
 
 app.listen(8081, () => {
