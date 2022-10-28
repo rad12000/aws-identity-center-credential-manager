@@ -10,11 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "os": "^0.1.2"
-  },
-  "devDependencies": {
-    "forever": "^4.0.3"
+    "express": "^4.18.2"
   }
 }

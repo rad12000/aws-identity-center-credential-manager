@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  awscredentialsservice:
+    build:
+      context: ./AwsCredentialsService
+      dockerfile: Dockerfile
+    ports:
+      - 8081:8081
+    volumes:
+      - $AWS_FILE_PATH:/app/aws

@@ -1,12 +1,11 @@
 const fs = require("fs");
-const os = require("os");
 
 /**
  *
  * @returns {Record<"[profile_name]", string>}
  */
 function getCredentials() {
-  const credentialsFile = "~/.aws/credentials".replace("~", os.homedir());
+  const credentialsFile = "./aws/credentials";
 
   if (!fs.existsSync(credentialsFile)) {
     return {};

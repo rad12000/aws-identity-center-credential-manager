@@ -1,13 +1,9 @@
 const express = require("express");
 const cors = require("cors");
-const os = require("os");
 const { FileBuilder } = require("./file-builder");
 const { getCredentials } = require("./get-credentials");
 
-require("dotenv").config();
 const app = express();
-
-console.log(process.env.AWS_CREDENTIAL_FILE);
 
 app.use(cors());
 app.use(express.json());
@@ -42,9 +38,9 @@ function createCredentialFile(creds) {
     fb.writeLine(profileWithBrackets).writeLine(credString.trim());
   }
 
-  fb.build(process.env.AWS_CREDENTIAL_FILE.replace("~", os.homedir()));
+  fb.build("./aws/credentials");
 }
 
-app.listen(8081, () => {
-  console.log("listening on: http://localhost:8081");
+app.listen(process.env.PORT || 8081, () => {
+  console.log("listening on: http://localhost:" + (process.env.PORT ?? 8081));
 });
