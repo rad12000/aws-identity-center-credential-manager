@@ -11,5 +11,5 @@
 4. Open your Chrome browser and navigate to [chrome://extensions/](chrome://extensions/)
 5. On the top right of your screen toggle on "Developer mode".
 6. On the top left of your screen click the "Load unpacked" button and navigate to/select the `AwsCredentialsExtension` sub folder in this project.
-7. You should now see the "Aws Credentials Extension under your extensions in Chrome. Feel free to pin it to your task bar.
+7. You should now see the "Aws Credentials Extension" under your extensions in Chrome. Feel free to pin it to your task bar.
 8. Navigate to your aws app login (should be somethingl like: https://\*.awsapps.com/start#/), open the extension and click the "Refresh x AWS Credentials" button. That's it!
