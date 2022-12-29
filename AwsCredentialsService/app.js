@@ -31,6 +31,7 @@ app.get("/profiles", async (req, res) => {
     const response = await Promise.all(instanceWithProfiles);
     res.status(200).json(response);
   } catch (e) {
+    console.log(e);
     res.status(500).json(e);
   }
 });

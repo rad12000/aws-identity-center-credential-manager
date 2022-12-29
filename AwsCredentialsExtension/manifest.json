@@ -7,5 +7,5 @@
     "default_popup": "index.html"
   },
   "permissions": ["scripting", "tabs", "cookies"],
-  "host_permissions": ["<all_urls>"]
+  "host_permissions": ["https://*.awsapps.com/*"]
 }

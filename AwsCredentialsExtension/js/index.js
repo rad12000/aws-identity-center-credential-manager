@@ -78,6 +78,7 @@ function buildConfigUI(profiles) {
           enabled: enabledBox.checked,
         };
         StorageService.putProfileConfig(config);
+        updateRefreshText();
       };
 
       const profileName = document.createElement("p");
@@ -112,6 +113,7 @@ function buildConfigUI(profiles) {
 
     container.append(appContainer);
     requestAnimationFrame(configureCollapsableProfiles);
+    updateRefreshText();
   }
 }
 
@@ -152,12 +154,25 @@ async function getSSOCookie() {
   return ssoCookies[0].value;
 }
 
+function updateRefreshText() {
+  const enabledCount = [
+    ...document.querySelectorAll("input.profile-enabled:checked"),
+  ].length;
+
+  const plural = enabledCount !== 1;
+  document.getElementById(
+    "refresh"
+  ).innerText = `Refresh ${enabledCount} AWS Credential${plural ? "s" : ""}`;
+}
+
 function setResultMessage(message) {
+  document.getElementById("refresh").classList.remove("hide");
   document.getElementById("result-container").innerText = message;
 }
 
 function setLoadingMessage() {
-  setResultMessage("Loading...");
+  document.getElementById("refresh").classList.add("hide");
+  document.getElementById("result-container").innerText = "Loading...";
 }
 
 function clearResultMessage() {
