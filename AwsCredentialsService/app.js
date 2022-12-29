@@ -1,18 +1,67 @@
-const express = require("express");
-const cors = require("cors");
-const { FileBuilder } = require("./file-builder");
-const { getCredentials } = require("./get-credentials");
+import express from "express";
+import cors from "cors";
+import { FileBuilder } from "./file-builder.js";
+import { getCredentials } from "./get-credentials.js";
+import { AwsPortalService } from "./aws-portal-service.js";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.post("/credentials", async (req, res) => {
+app.get("/profiles", async (req, res) => {
   try {
+    const awsJwt = req.headers.authorization.split("Bearer ")[1];
+    const awsService = new AwsPortalService(awsJwt);
+    const apps = await awsService.getAppInstances();
+    const instanceWithProfiles = apps.result
+      .filter((app) => app.applicationName === "AWS Account")
+      .map((r) => {
+        return new Promise((resolve, reject) => {
+          awsService
+            .getAppInstanceProfiles(r.id)
+            .then((res) => {
+              r.profiles = res.result;
+              resolve(r);
+            })
+            .catch((err) => reject(err));
+        });
+      });
+
+    const response = await Promise.all(instanceWithProfiles);
+    res.status(200).json(response);
+  } catch (e) {
+    res.status(500).json(e);
+  }
+});
+
+app.put("/credentials", async (req, res) => {
+  try {
+    /**
+     * @type {PutCredentialsRequest}
+     */
     const creds = req.body;
-    createCredentialFile(creds);
-    res.status(201).end();
+    const awsJwt = req.headers.authorization.split("Bearer ")[1];
+    const awsService = new AwsPortalService(awsJwt);
+    const refreshedCredPrms = creds.map(async (c) => {
+      try {
+        const result = await awsService.getAwsCredentials(
+          c.accountId,
+          c.roleName
+        );
+        return { ...result, alias: c.alias };
+      } catch (err) {
+        throw err;
+      }
+    });
+    const refreshedCreds = await Promise.all(refreshedCredPrms);
+    createCredentialFile(
+      refreshedCreds.reduce((prev, c) => {
+        prev[c.alias] = c;
+        return prev;
+      }, {})
+    );
+    res.status(204).end();
   } catch (e) {
     console.log(e);
     res.status(500).end();

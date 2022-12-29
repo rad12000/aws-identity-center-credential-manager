@@ -1,10 +1,10 @@
-const fs = require("fs");
+import fs from "fs";
 
 /**
  *
  * @returns {Record<"[profile_name]", string>}
  */
-function getCredentials() {
+export function getCredentials() {
   const credentialsFile = "./aws/credentials";
 
   if (!fs.existsSync(credentialsFile)) {
@@ -30,5 +30,3 @@ function getCredentials() {
 
   return profileMap;
 }
-
-module.exports = { getCredentials };

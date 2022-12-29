@@ -1,7 +1,6 @@
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
 
-class FileBuilder {
+export class FileBuilder {
   #fileParts = [];
 
   writeLine(str) {
@@ -29,5 +28,3 @@ class FileBuilder {
     fs.writeFileSync(filePath, this.#fileParts.join(""));
   }
 }
-
-module.exports = { FileBuilder };
