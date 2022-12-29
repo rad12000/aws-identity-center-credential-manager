@@ -1,0 +1,83 @@
+* {
+  box-sizing: border-box;
+}
+button:hover {
+  cursor: grab;
+}
+
+button {
+  border: solid #ff9900 3px;
+  border-radius: 5px;
+  background-color: white;
+  font-weight: bold;
+  outline: none;
+  box-shadow: 1px 2px 11px -4px black;
+}
+
+button:active {
+  box-shadow: none;
+}
+
+html,
+body {
+  height: fit-content;
+}
+
+body {
+  text-align: center;
+  font-size: 16px;
+}
+
+.app-name {
+  cursor: grab;
+}
+
+#config-container {
+  text-align: left;
+}
+
+.profile-enabled {
+  float: right;
+  margin: 0px;
+}
+
+p.app-name::before {
+  content: "Account";
+  display: block;
+  font-weight: bold;
+}
+
+p.profile-name::before {
+  content: "Profile";
+  font-weight: bold;
+  display: block;
+}
+
+.profile-name {
+  margin-top: 0px;
+}
+
+label.profile-alias {
+  font-weight: bold;
+  display: block;
+}
+
+input.profile-alias {
+  font-size: 16px;
+  padding: 1px;
+  width: 100%;
+}
+
+.profile-container {
+  margin-left: 1em;
+  transition: height 0.3s;
+  overflow-y: hidden;
+}
+
+.profile-container:nth-of-type(odd) {
+  background-color: #d3d3d373;
+}
+
+div#config-container p {
+  white-space: nowrap;
+}
