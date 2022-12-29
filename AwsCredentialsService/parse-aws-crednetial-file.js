@@ -4,7 +4,7 @@ import fs from "fs";
  *
  * @returns {Record<"[profile_name]", string>}
  */
-export function getCredentials() {
+export function parseAwsCredentialFile() {
   const credentialsFile = "./aws/credentials";
 
   if (!fs.existsSync(credentialsFile)) {

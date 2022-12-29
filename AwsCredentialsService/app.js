@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { FileBuilder } from "./file-builder.js";
-import { getCredentials } from "./get-credentials.js";
+import { parseAwsCredentialFile } from "./parse-aws-crednetial-file.js";
 import { AwsPortalService } from "./aws-portal-service.js";
 
 const app = express();
@@ -70,7 +70,7 @@ app.put("/credentials", async (req, res) => {
 });
 
 function createCredentialFile(creds) {
-  const existingCreds = getCredentials();
+  const existingCreds = parseAwsCredentialFile();
   const fb = new FileBuilder();
 
   for (const [profile, credentials] of Object.entries(creds)) {
