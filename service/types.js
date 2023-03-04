@@ -6,7 +6,7 @@
  * @property {string} result.name
  * @property {string} result.description
  * @property {string} result.applicationId
- * @property {"SonarQube Application" | "AWS Account"} result.applicationName
+ * @property {"AWS Account"} result.applicationName
  * @property {string} result.icon
  * @property {object|null} result.searchMetadata
  * @property {string} result.searchMetadata.AccountId

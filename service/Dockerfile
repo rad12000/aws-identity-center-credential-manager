@@ -6,5 +6,7 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 
-EXPOSE 81
+ENV PORT=80
+ENV CREDENTIAL_FILE="aws/credentials"
+EXPOSE 80
 CMD [ "npm", "start" ]

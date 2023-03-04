@@ -1,12 +1,12 @@
 version: "3.9"
 
 services:
-  aws-credential-service:
-    build:
-      context: ./AwsCredentialsService
-      dockerfile: Dockerfile
-    ports:
-      - 8081:8081
-    restart: always
-    volumes:
-      - ~/.aws/:/app/aws
+    aws-credential-service:
+        build:
+            context: ./service
+            dockerfile: Dockerfile
+        ports:
+            - 50173:80
+        restart: always
+        volumes:
+            - ~/.aws/:/app/aws
