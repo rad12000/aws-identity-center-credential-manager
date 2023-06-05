@@ -18,7 +18,7 @@ export class AwsPortalService {
     url.searchParams.append("role_name", roleName);
     const headers = await this.#defaultHeaders();
 
-    const response = await fetch(url.toString(), {
+    const response = await fetchWithRetries(url.toString(), 3, {
       headers,
       method: "GET",
     });
@@ -41,8 +41,9 @@ export class AwsPortalService {
     const url = new URL(AwsPortalService.#baseUrl);
     url.pathname = "instance/appinstances";
     const headers = await this.#defaultHeaders();
+    console.log(JSON.stringify(headers));
 
-    const response = await fetch(url.toString(), {
+    const response = await fetchWithRetries(url.toString(), 3, {
       headers,
       method: "GET",
     });
@@ -61,8 +62,10 @@ export class AwsPortalService {
     const url = new URL(AwsPortalService.#baseUrl);
     url.pathname = `instance/appinstance/${instanceId}/profiles`;
     const headers = await this.#defaultHeaders();
+    console.log(url.toString());
+    console.log(JSON.stringify(headers));
 
-    const response = await fetch(url.toString(), {
+    const response = await fetchWithRetries(url.toString(), 3, {
       headers,
       method: "GET",
     });
@@ -80,5 +83,19 @@ export class AwsPortalService {
       "accept-language": "en-US,en;q=0.9",
       "x-amz-sso_bearer_token": this.#jwt,
     };
+  }
+}
+
+async function fetchWithRetries(url, retryCount, options = {}) {
+  try {
+    const response = await fetch(url, options);
+    return response;
+  } catch (e) {
+    if (retryCount > 0) {
+      console.log(`fetch ${url} failed. Retrying...`);
+      return fetchWithRetries(url, --retryCount, options);
+    }
+
+    throw e;
   }
 }
