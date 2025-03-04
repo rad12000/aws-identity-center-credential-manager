@@ -120,6 +120,18 @@ async function fetchWithRetries(url, retryCount, requestOptions) {
 
     const response = await fetch(url, requestOptions);
     if (!response.ok) {
+      console.error(
+        "got error response",
+        JSON.stringify(
+          {
+            status: response.status,
+            url,
+            body: await response.text(),
+          },
+          null,
+          3
+        )
+      );
       return { ok: false };
     }
 
@@ -129,6 +141,7 @@ async function fetchWithRetries(url, retryCount, requestOptions) {
       json: () => Promise.resolve(json),
       status: response.status,
     };
+
     if (useCache) {
       console.debug("caching response for url", url);
       cache.set(url, res, { ttlSeconds: cacheEntryTTLSeconds });
