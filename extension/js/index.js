@@ -50,22 +50,54 @@ async function refreshAwsCredentials() {
 }
 
 /**
- * @param {GetProfilesResponse} profiles
+ * @param {GetProfilesResponse} accounts
  */
-function buildConfigUI(profiles) {
+function buildConfigUI(accounts) {
   const container = document.getElementById("config-container");
-  for (const profile of profiles) {
-    const appContainer = document.createElement("div");
+  accounts.sort((a, b) =>
+    a.searchMetadata.AccountName.localeCompare(b.searchMetadata.AccountName)
+  );
+
+  for (const account of accounts) {
+    const appContainer = document.createElement("details");
     appContainer.classList.add("app-container");
-    const appNameEl = document.createElement("p");
+
+    const appNameEl = document.createElement("summary");
     appNameEl.classList.add("app-name");
-    appNameEl.innerText = profile.name;
+    appNameEl.innerHTML = `${account.searchMetadata.AccountName} <span>(${account.searchMetadata.AccountId})</span>`;
     appContainer.append(appNameEl);
 
-    for (const p of profile.profiles) {
+    let longestProfileName = 0;
+    for (const p of account.profiles) {
+      longestProfileName = Math.max(longestProfileName, p.name.length);
+    }
+
+    for (const p of account.profiles) {
       const profileConfig = StorageService.getProfileConfigById(p.id);
       const profileContainer = document.createElement("div");
       profileContainer.classList.add("profile-container");
+
+      const profileName = document.createElement("p");
+      const spacesToAdd = new Array(longestProfileName - p.name.length)
+        .fill("_")
+        .join("");
+      profileName.classList.add("profile-name");
+      profileName.innerHTML = `${p.name}<span class='transparent-text'>${spacesToAdd}</span>`;
+
+      const profileAlias = document.createElement("input");
+      profileAlias.placeholder = "profile_name";
+      profileAlias.type = "text";
+      profileAlias.value =
+        profileConfig?.alias ?? `${account.searchMetadata.AccountId}_${p.name}`;
+      profileAlias.classList.add("profile-alias");
+      profileAlias.oninput = () => {
+        const config = {
+          ...(StorageService.getProfileConfigById(p.id) ?? {}),
+          id: p.id,
+          alias: profileAlias.value,
+        };
+        StorageService.putProfileConfig(config);
+      };
 
       const enabledBox = document.createElement("input");
       enabledBox.type = "checkbox";
@@ -81,64 +113,19 @@ function buildConfigUI(profiles) {
         updateRefreshText();
       };
 
-      const profileName = document.createElement("p");
-      profileName.classList.add("profile-name");
-      profileName.innerText = p.name;
-
-      const profileAliasLabel = document.createElement("label");
-      profileAliasLabel.classList.add("profile-alias");
-      profileAliasLabel.innerText = "Alias";
-      const profileAlias = document.createElement("input");
-      profileAlias.type = "text";
-      profileAlias.value =
-        profileConfig?.alias ?? `${profile.searchMetadata.AccountId}_${p.name}`;
-      profileAlias.classList.add("profile-alias");
-      profileAlias.oninput = () => {
-        const config = {
-          ...(StorageService.getProfileConfigById(p.id) ?? {}),
-          id: p.id,
-          alias: profileAlias.value,
-        };
-        StorageService.putProfileConfig(config);
-      };
-
-      profileContainer.append(
-        enabledBox,
-        profileName,
-        profileAliasLabel,
-        profileAlias
-      );
+      profileContainer.append(profileName, profileAlias, enabledBox);
       appContainer.append(profileContainer);
     }
 
     container.append(appContainer);
-    requestAnimationFrame(configureCollapsableProfiles);
     updateRefreshText();
   }
 }
 
-function configureCollapsableProfiles() {
-  const container = document.getElementById("config-container");
-  container.querySelectorAll(".app-container").forEach((app) => {
-    const profileContainers = app.querySelectorAll(".profile-container");
-    profileContainers.forEach((p) => {
-      p.setAttribute("x-open", true);
-      p.style.height = `${p.scrollHeight}px`;
-    });
-
-    app.querySelector(".app-name").onclick = () => {
-      profileContainers.forEach((p) => {
-        const isOpen = p.getAttribute("x-open") === "true";
-        p.setAttribute("x-open", !isOpen);
-
-        if (isOpen) {
-          p.style.height = "0px";
-        } else {
-          p.style.height = `${p.scrollHeight}px`;
-        }
-      });
-    };
-  });
+function asTableColumn(node) {
+  const td = document.createElement("td");
+  td.append(node);
+  return td;
 }
 
 async function getSSOCookie() {
