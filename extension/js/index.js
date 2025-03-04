@@ -25,13 +25,18 @@ async function refreshAwsCredentials() {
     const profileData = profileContainers.reduce((prev, profile) => {
       const enabled = profile.querySelector(".profile-enabled").checked;
       if (!enabled) return prev;
-      const roleName = profile.querySelector(".profile-name").innerText;
+      const roleName = profile
+        .querySelector(".profile-name")
+        .textContent.replaceAll(/_+$/g, "");
       const alias = profile.querySelector("input.profile-alias").value;
       prev.push({ roleName, alias });
       return prev;
     }, []);
 
-    const accountId = app.querySelector(".app-name").innerText.split(" ")[0];
+    const accountIdRegex = /\s\((\d+)\)$/;
+    const accountId = accountIdRegex.exec(
+      app.querySelector(".app-name").innerText
+    )[1];
     return profileData.map((d) => {
       return { ...d, accountId };
     });
@@ -57,6 +62,7 @@ function buildConfigUI(accounts) {
   accounts.sort((a, b) =>
     a.searchMetadata.AccountName.localeCompare(b.searchMetadata.AccountName)
   );
+  let longestString = 0;
 
   for (const account of accounts) {
     const appContainer = document.createElement("details");
@@ -72,10 +78,20 @@ function buildConfigUI(accounts) {
       longestProfileName = Math.max(longestProfileName, p.name.length);
     }
 
+    longestString = Math.max(
+      longestString,
+      account.searchMetadata.AccountName.length +
+        account.searchMetadata.AccountId.length
+    );
+
     for (const p of account.profiles) {
       const profileConfig = StorageService.getProfileConfigById(p.id);
+      const profileKey =
+        profileConfig?.alias ?? `${account.searchMetadata.AccountId}_${p.name}`;
       const profileContainer = document.createElement("div");
       profileContainer.classList.add("profile-container");
+
+      longestString = Math.max(longestString, profileKey.length);
 
       const profileName = document.createElement("p");
       const spacesToAdd = new Array(longestProfileName - p.name.length)
@@ -87,8 +103,7 @@ function buildConfigUI(accounts) {
       const profileAlias = document.createElement("input");
       profileAlias.placeholder = "profile_name";
       profileAlias.type = "text";
-      profileAlias.value =
-        profileConfig?.alias ?? `${account.searchMetadata.AccountId}_${p.name}`;
+      profileAlias.value = profileKey;
       profileAlias.classList.add("profile-alias");
       profileAlias.oninput = () => {
         const config = {
@@ -120,12 +135,10 @@ function buildConfigUI(accounts) {
     container.append(appContainer);
     updateRefreshText();
   }
-}
 
-function asTableColumn(node) {
-  const td = document.createElement("td");
-  td.append(node);
-  return td;
+  container.querySelectorAll("details").forEach((el) => {
+    el.style.minWidth = `${Math.ceil(longestString * 0.8)}em`;
+  });
 }
 
 async function getSSOCookie() {
