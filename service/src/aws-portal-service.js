@@ -1,3 +1,5 @@
+import { InMemoryCache } from "./cache.js";
+
 export class AwsPortalService {
   static #baseUrl = "https://portal.sso.us-east-1.amazonaws.com";
   #jwt = "";
@@ -41,7 +43,6 @@ export class AwsPortalService {
     const url = new URL(AwsPortalService.#baseUrl);
     url.pathname = "instance/appinstances";
     const headers = await this.#defaultHeaders();
-    console.log(JSON.stringify(headers));
 
     const response = await fetchWithRetries(url.toString(), 3, {
       headers,
@@ -62,8 +63,6 @@ export class AwsPortalService {
     const url = new URL(AwsPortalService.#baseUrl);
     url.pathname = `instance/appinstance/${instanceId}/profiles`;
     const headers = await this.#defaultHeaders();
-    console.log(url.toString());
-    console.log(JSON.stringify(headers));
 
     const response = await fetchWithRetries(url.toString(), 3, {
       headers,
@@ -86,14 +85,73 @@ export class AwsPortalService {
   }
 }
 
-async function fetchWithRetries(url, retryCount, options = {}) {
+const cache = new InMemoryCache();
+const cacheEntryTTLSeconds = (() => {
   try {
-    const response = await fetch(url, options);
-    return response;
+    const ttlSeconds = parseInt(process.env.CACHE_TTL_SECONDS, 10);
+    if (isNaN(ttlSeconds)) {
+      throw "NaN";
+    }
+
+    console.info("using cache ttl of", ttlSeconds, "seconds");
+    return ttlSeconds;
+  } catch (e) {
+    console.info("using default cache ttl of 1 minute");
+    return 60;
+  }
+})();
+/**
+ * @param {string} url
+ * @param {number} retryCount
+ * @param {any} requestOptions
+ * @param {{cache: boolean}} options
+ * @returns {Promise<{ok: boolean; json(): Promise<any>;}>}
+ */
+async function fetchWithRetries(url, retryCount, requestOptions) {
+  const useCache = cacheEntryTTLSeconds > 0;
+  try {
+    if (useCache) {
+      const [found, value] = cache.get(url);
+      if (found) {
+        console.debug("using cached response for url", url);
+        return value;
+      }
+    }
+
+    const response = await fetch(url, requestOptions);
+    if (!response.ok) {
+      console.error(
+        "got error response",
+        JSON.stringify(
+          {
+            status: response.status,
+            url,
+            body: await response.text(),
+          },
+          null,
+          3
+        )
+      );
+      return { ok: false };
+    }
+
+    const json = await response.json();
+    const res = {
+      ok: true,
+      json: () => Promise.resolve(json),
+      status: response.status,
+    };
+
+    if (useCache) {
+      console.debug("caching response for url", url);
+      cache.set(url, res, { ttlSeconds: cacheEntryTTLSeconds });
+    }
+
+    return res;
   } catch (e) {
     if (retryCount > 0) {
       console.log(`fetch ${url} failed. Retrying...`);
-      return fetchWithRetries(url, --retryCount, options);
+      return fetchWithRetries(url, --retryCount, requestOptions);
     }
 
     throw e;

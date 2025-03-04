@@ -1,12 +1,13 @@
 version: "3.9"
 
 services:
-    aws-credential-service:
-        build:
-            context: ./service
-            dockerfile: Dockerfile
-        ports:
-            - 50173:80
-        restart: always
-        volumes:
-            - ~/.aws/:/app/aws
+  aws-credential-service:
+    image: cbekmezian/aws-credential-manager:latest
+    # build:
+    #   context: ./service
+    #   dockerfile: Dockerfile
+    ports:
+      - 50173:80
+    restart: always
+    volumes:
+      - ~/.aws/:/app/aws

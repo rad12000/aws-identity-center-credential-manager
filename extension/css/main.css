@@ -1,5 +1,8 @@
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: monospace;
 }
 
 .hide {
@@ -17,6 +20,8 @@ button {
   font-weight: bold;
   outline: none;
   box-shadow: 1px 2px 11px -4px black;
+  padding: 0.5em;
+  margin-top: 0.5em;
 }
 
 button:active {
@@ -42,45 +47,53 @@ body {
 }
 
 .profile-enabled {
-  float: right;
-  margin: 0px;
+  accent-color: #ff9900;
+  color: white;
 }
 
-p.app-name::before {
-  content: "Account";
+.app-container {
   display: block;
+  padding: 1em;
+}
+
+.app-container:not(:last-of-type) {
+  border-bottom: solid 1px rgb(222, 222, 222);
+}
+
+.app-name {
   font-weight: bold;
+  white-space: nowrap;
 }
 
-p.profile-name::before {
-  content: "Profile";
+.app-name > span {
+  font-weight: normal;
+  color: gray;
+}
+
+p.profile-name {
   font-weight: bold;
-  display: block;
-}
-
-.profile-name {
-  margin-top: 0px;
-}
-
-label.profile-alias {
-  font-weight: bold;
-  display: block;
-}
-
-input.profile-alias {
-  font-size: 16px;
-  padding: 1px;
-  width: 100%;
+  align-self: center;
 }
 
 .profile-container {
+  margin-top: 0.5em;
+  display: grid;
+  grid-template-columns: auto 1fr 2em;
+  column-gap: 1em;
   margin-left: 1em;
-  transition: height 0.3s;
-  overflow-y: hidden;
+  align-items: stretch;
 }
 
-.profile-container:nth-of-type(odd) {
-  background-color: #d3d3d373;
+input.profile-alias {
+  font-size: 1em;
+  padding: 5px;
+  width: 100%;
+  border: solid black 1px;
+  border-radius: 5px;
+}
+
+.transparent-text {
+  color: transparent;
 }
 
 div#config-container p {
