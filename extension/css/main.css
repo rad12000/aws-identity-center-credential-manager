@@ -1,101 +1,393 @@
-* {
+/* === Reset & Base === */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: monospace;
 }
 
-.hide {
-  display: none;
-}
-
-button:hover {
-  cursor: grab;
-}
-
-button {
-  border: solid #ff9900 3px;
-  border-radius: 5px;
-  background-color: white;
-  font-weight: bold;
-  outline: none;
-  box-shadow: 1px 2px 11px -4px black;
-  padding: 0.5em;
-  margin-top: 0.5em;
-}
-
-button:active {
-  box-shadow: none;
+:root {
+  --aws-orange: #ff9900;
+  --aws-orange-hover: #ec7211;
+  --aws-dark: #232f3e;
+  --aws-darker: #1a242f;
+  --aws-light: #f2f3f3;
+  --aws-border: #d5dbdb;
+  --aws-text: #16191f;
+  --aws-text-secondary: #545b64;
+  --aws-success: #1d8102;
+  --aws-success-bg: #f2f8f0;
+  --aws-error: #d13212;
+  --aws-error-bg: #fdf3f1;
+  --radius: 8px;
+  --shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 
 html,
 body {
-  height: fit-content;
+  width: 420px;
+  min-height: 100px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  color: var(--aws-text);
+  background: var(--aws-light);
 }
 
-body {
+.hide {
+  display: none !important;
+}
+
+/* === Header === */
+header {
+  background: var(--aws-dark);
+  color: #fff;
+  padding: 12px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.header-bar h3 {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* === Status Bar === */
+#status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  border-bottom: 1px solid var(--aws-border);
+}
+
+#status-bar.success {
+  background: var(--aws-success-bg);
+  color: var(--aws-success);
+}
+
+#status-bar.error {
+  background: var(--aws-error-bg);
+  color: var(--aws-error);
+}
+
+/* === Loading === */
+#loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  gap: 12px;
+  color: var(--aws-text-secondary);
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--aws-border);
+  border-top-color: var(--aws-orange);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* === Error === */
+#error-container {
+  padding: 16px;
   text-align: center;
-  font-size: 16px;
+  color: var(--aws-error);
 }
 
-.app-name {
-  cursor: grab;
+/* === Config / Account List === */
+main {
+  max-height: 420px;
+  overflow-y: auto;
 }
 
 #config-container {
-  text-align: left;
+  padding: 0;
 }
 
-.profile-enabled {
-  accent-color: #ff9900;
-  color: white;
+/* === Select All Bar === */
+#select-all-bar {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  background: #fff;
+  border-bottom: 1px solid var(--aws-border);
 }
 
+.select-all-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--aws-text-secondary);
+  user-select: none;
+}
+
+.select-all-label input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--aws-orange);
+  cursor: pointer;
+  margin: 0;
+}
+
+/* Account card (details/summary) */
 .app-container {
-  display: block;
-  padding: 1em;
+  background: #fff;
+  border-bottom: 1px solid var(--aws-border);
+  list-style: none;
 }
 
-.app-container:not(:last-of-type) {
-  border-bottom: solid 1px rgb(222, 222, 222);
+.app-container:last-child {
+  border-bottom: none;
 }
 
+/* Hide default marker */
+.app-container > summary {
+  list-style: none;
+}
+
+.app-container > summary::-webkit-details-marker {
+  display: none;
+}
+
+.app-container > summary::marker {
+  content: "";
+}
+
+/* Account header (summary) */
 .app-name {
-  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.app-name:hover {
+  background: var(--aws-light);
+}
+
+.app-name-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.account-label {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.app-name > span {
-  font-weight: normal;
-  color: gray;
+.app-name .account-id {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--aws-text-secondary);
+  font-family: "SF Mono", "Menlo", "Consolas", monospace;
 }
 
-p.profile-name {
-  font-weight: bold;
-  align-self: center;
+.chevron {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+  color: var(--aws-text-secondary);
+  flex-shrink: 0;
 }
 
+.app-container[open] > summary .chevron {
+  transform: rotate(90deg);
+}
+
+/* Individual profile row — single line: role name | alias input | help | checkbox */
 .profile-container {
-  margin-top: 0.5em;
-  display: grid;
-  grid-template-columns: auto 1fr 2em;
-  column-gap: 1em;
-  margin-left: 1em;
-  align-items: stretch;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px 8px 28px;
+  border-top: 1px solid var(--aws-border);
+  background: #fff;
 }
 
-input.profile-alias {
-  font-size: 1em;
-  padding: 5px;
-  width: 100%;
-  border: solid black 1px;
-  border-radius: 5px;
+.profile-container:nth-child(even) {
+  background: #fafafa;
 }
 
-.transparent-text {
-  color: transparent;
-}
-
-div#config-container p {
+/* Role name */
+.profile-name {
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--aws-text);
   white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Alias input */
+.profile-alias {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  padding: 4px 8px;
+  border: 1px solid var(--aws-border);
+  border-radius: 4px;
+  font-family: "SF Mono", "Menlo", "Consolas", monospace;
+  outline: none;
+  transition: border-color 0.15s;
+  color: var(--aws-text);
+}
+
+.profile-alias:focus {
+  border-color: var(--aws-orange);
+  box-shadow: 0 0 0 2px rgba(255, 153, 0, 0.15);
+}
+
+/* Checkbox */
+.profile-enabled {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--aws-orange);
+  cursor: pointer;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* Help icon with tooltip */
+.alias-help {
+  position: relative;
+  font-size: 14px;
+  color: var(--aws-text-secondary);
+  cursor: help;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.alias-help::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: -8px;
+  width: 240px;
+  padding: 8px 10px;
+  background: var(--aws-dark);
+  color: #fff;
+  font-size: 11px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.45;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s, transform 0.15s;
+  z-index: 100;
+}
+
+.alias-help::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 2px);
+  right: 4px;
+  border: 6px solid transparent;
+  border-top-color: var(--aws-dark);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 100;
+}
+
+.alias-help:hover::after,
+.alias-help:hover::before {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* === Footer / Refresh Button === */
+footer {
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  border-top: 1px solid var(--aws-border);
+  padding: 10px 16px;
+}
+
+#refresh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--aws-orange);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+  box-shadow: var(--shadow);
+}
+
+#refresh:hover:not(:disabled) {
+  background: var(--aws-orange-hover);
+}
+
+#refresh:active:not(:disabled) {
+  box-shadow: none;
+  transform: translateY(1px);
+}
+
+#refresh:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* === Scrollbar === */
+main::-webkit-scrollbar {
+  width: 6px;
+}
+
+main::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+main::-webkit-scrollbar-thumb {
+  background: var(--aws-border);
+  border-radius: 3px;
+}
+
+main::-webkit-scrollbar-thumb:hover {
+  background: #aab7b8;
 }

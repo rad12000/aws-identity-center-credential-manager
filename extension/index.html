@@ -1,11 +1,48 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./css/main.css" />
   </head>
   <body>
-    <button id="refresh" class="hide">Refresh AWS Credentials</button>
-    <div id="result-container"></div>
-    <div id="config-container"></div>
+    <header>
+      <div class="header-bar">
+        <img class="header-icon" src="./assets/ico-32x32.png" alt="" />
+        <h3>AWS Credential Manager</h3>
+      </div>
+    </header>
+
+    <main>
+      <div id="status-bar" class="hide">
+        <span id="status-text"></span>
+      </div>
+
+      <div id="loading-container" class="hide">
+        <div class="spinner"></div>
+        <p>Loading accounts…</p>
+      </div>
+
+      <div id="error-container" class="hide">
+        <p id="error-text"></p>
+      </div>
+
+      <div id="select-all-bar" class="hide">
+        <label class="select-all-label">
+          <input type="checkbox" id="select-all" checked />
+          <span>Select all</span>
+        </label>
+      </div>
+
+      <div id="config-container"></div>
+    </main>
+
+    <footer id="footer" class="hide">
+      <button id="refresh" disabled>
+        <span id="refresh-text">Refresh Credentials</span>
+      </button>
+    </footer>
+
     <script src="./js/index.js" type="module"></script>
   </body>
 </html>
